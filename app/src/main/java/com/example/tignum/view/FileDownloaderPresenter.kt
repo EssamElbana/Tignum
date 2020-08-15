@@ -80,20 +80,23 @@ class FileDownloaderPresenter(
                 println("file: $name, progress: $progress, bytes:$downloadedSoFar, total:$totalFileLength ")
                 fileItemList[position].progress = progress
                 fileItem.progress = progress
-                view!!.setItemChanged(position, PAYLOAD_TAG_PROGRESS)
+                if(view != null)
+                    view!!.setItemChanged(position, PAYLOAD_TAG_PROGRESS)
             })
             when (result) {
                 "completed" -> {
                     fileItemList[position].status = FileStatus.COMPLETE.name
-                    view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
+                    if (view != null)
+                        view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
                     repository.updateFileItem(fileItem)
                 }
                 else -> {
                     val item = fileItemList[position]
                     item.status = FileStatus.PAUSED.name
                     repository.updateFileItem(item)
-                    view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
-                    if(!result!!.contains("stream closed"))
+                    if(view !=null)
+                        view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
+                    if(!result!!.contains("closed"))
                         view!!.showErrorMessage("Failed reason: $result file name: ${item.fileName}")
                 }
             }
@@ -123,10 +126,6 @@ class FileDownloaderPresenter(
         if (fileItemList[position].status == FileStatus.IN_DOWNLOAD.name) {
             CoroutineScope(Main).launch {
                 repository.stopDownload(fileItemList[position])
-//                val fileItem = fileItemList[position]
-//                fileItem.status = FileStatus.PAUSED.name
-//                repository.updateFileItem(fileItem)
-//                view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
             }
         } else if (fileItemList[position].status == FileStatus.COMPLETE.name)
             view!!.showErrorMessage("File downloaded")
@@ -152,10 +151,6 @@ class FileDownloaderPresenter(
         CoroutineScope(Main).launch {
             val fileItems = repository.getAllFileItems()
             fileItemList.addAll(fileItems)
-            fileItemList.removeAll(fileItems)
-            fileItems.forEach {
-                repository.deleteFile(it)
-            }
             view!!.showFileList(fileItemList)
             view!!.requestUserPermission()
         }
