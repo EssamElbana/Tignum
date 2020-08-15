@@ -12,9 +12,34 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:padding="8dp"
-        android:text="MediaFile Downloader Screen"
+        android:text="@string/title_main_screen"
         android:textColor="#000000"
         android:textSize="22sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/urlEditTextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:hint="@string/type_url_hint"
+        android:padding="4dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/enqueueBtn"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="8dp"
+        android:text="@string/enqueue_button_text"
+        android:textColor="#FFFFFF" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,79 +49,53 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="4">
+            android:layout_margin="12dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="3">
 
-            <Button
-                android:id="@+id/startButton"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:padding="8dp"
-                android:text="Start" />
+                android:text="@string/file_progress_text_view"
+                android:textColor="#000000"
+                android:textSize="20sp" />
 
-            <Button
-                android:id="@+id/pauseButton"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/progressOfFile"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="Pause" />
-
-            <Button
-                android:id="@+id/deleteButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="Delete" />
-            <Button
-                android:id="@+id/playButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:text="Play" />
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="bytes"
+                android:textColor="#000000"
+                android:textSize="20sp" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/currentStatusTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Current Status Of File"
-            android:textColor="#000000"
-            android:textSize="22sp" />
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:max="100"
-            android:progress="00"
-            android:background="#000000"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
-
-        <VideoView
-            android:id="@+id/videoView"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:padding="8dp" />
-        <!--    <Button-->
-        <!--        android:id="@+id/playButton"-->
-        <!--        android:layout_width="250dp"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        android:layout_margin="8dp"-->
-        <!--        android:padding="8dp"-->
-        <!--        android:text="Play Media File" />-->
+            android:layout_margin="12dp"
+            android:max="100"
+            android:padding="4dp"
+            android:progress="0"
+            android:visibility="visible" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp" />
+
+
+        <!--        <VideoView-->
+        <!--            android:id="@+id/videoView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="8dp"-->
+        <!--            android:padding="8dp" />-->
     </LinearLayout>
 </LinearLayout>

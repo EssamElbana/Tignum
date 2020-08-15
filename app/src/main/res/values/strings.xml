@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Tignum Task</string>
+    <string name="start_button_text">Start</string>
+    <string name="pause_button_text">Pause</string>
+    <string name="play_button_text">Play</string>
+    <string name="delete_button_text">Delete</string>
+    <string name="title_main_screen">MediaFile Downloader</string>
+    <string name="type_url_hint">Type URL</string>
+    <string name="enqueue_button_text">Enqueue</string>
+    <string name="file_progress_text_view">File Progress:</string>
 </resources>

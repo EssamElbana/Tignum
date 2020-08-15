@@ -5,49 +5,39 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.widget.MediaController
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.tignum.view.FileItem
+import com.example.tignum.view.FilesRecyclerViewAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 
 
-class MainActivity : FileDownloaderContract.View, AppCompatActivity() {
+class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
+    FilesRecyclerViewAdapter.ButtonsClickListener {
 
     private val permissionRequestCode = 1000
     private lateinit var presenter: FileDownloaderContract.Presenter
+    private lateinit var linearLayoutManager: LinearLayoutManager
+    private val adapter = FilesRecyclerViewAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        linearLayoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = linearLayoutManager
         presenter = FileDownloaderPresenter(this, this)
+        recyclerView.adapter = adapter
+        recyclerView.setHasFixedSize(true)
 
         presenter.onViewCreated()
 
-
-        startButton.setOnClickListener {
-            presenter.startDownload()
-        }
-
-        pauseButton.setOnClickListener {
-            presenter.pauseDownload()
-        }
-
-        deleteButton.setOnClickListener {
-            presenter.deleteFile()
-        }
-
-        playButton.setOnClickListener {
-            presenter.playFile()
-        }
-
-    }
-
-    override fun showCurrentStatus(status: String) {
-        CoroutineScope(Main).launch {
-            currentStatusTextView.text = status
+        enqueueBtn.setOnClickListener {
+            presenter.enqueueBtnClicked()
         }
     }
 
@@ -56,6 +46,21 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity() {
         builder.setMessage(status)
         builder.setNeutralButton(android.R.string.yes) { dialog, which -> }
         builder.show()
+    }
+
+    override fun playMediaFile(fileUri: Uri) {
+//        val mediaController = MediaController(this);
+//        videoView.setVideoURI(fileUri)
+//        videoView.setMediaController(mediaController)
+//        videoView.start()
+    }
+
+
+    override fun getInputUrl() = urlEditTextLayout.editText!!.text.toString()
+
+    override fun showFileList(fileList: ArrayList<FileItem>) {
+        adapter.listOfFiles = fileList
+        adapter.notifyDataSetChanged()
     }
 
     override fun requestUserPermission() {
@@ -79,28 +84,6 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity() {
             presenter.onPermissionsReady()
     }
 
-    override fun playMediaFile(fileUri: Uri) {
-        val mediaController = MediaController(this);
-        videoView.setVideoURI(fileUri)
-        videoView.setMediaController(mediaController)
-        videoView.start()
-    }
-
-    override fun enableButtons(map: HashMap<ButtonEnum, Boolean>) {
-        for (button :ButtonEnum in map.keys) {
-            when (button) {
-                ButtonEnum.PAUSE -> pauseButton.isEnabled = map[button]!!
-                ButtonEnum.PLAY -> pauseButton.isEnabled = map[button]!!
-                ButtonEnum.DELETE -> pauseButton.isEnabled = map[button]!!
-                ButtonEnum.START -> pauseButton.isEnabled = map[button]!!
-            }
-        }
-    }
-
-    override fun setProgressbarValue(value: Int) {
-        progressBar.setProgress(value)
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -113,15 +96,34 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity() {
                         grantResults[0] == PackageManager.PERMISSION_GRANTED)
             ) {
                 presenter.onPermissionsReady()
+
             } else {
-                // todo add below stuff.
-                // Explain to the user that the feature is unavailable because
-                // the features requires a permission that the user has denied.
-                // At the same time, respect the user's decision. Don't link to
-                // system settings in an effort to convince the user to change
-                // their decision.
+                showErrorMessage("Application won't be able to download files!")
             }
         }
     }
+
+    override fun deleteBtnClicked(position: Int) = presenter.delete(position)
+
+    override fun startBtnClicked(position: Int) = presenter.start(position)
+
+    override fun pauseBtnClicked(position: Int) = presenter.pause(position)
+
+    override fun playBtnClicked(position: Int) = presenter.play(position)
+
+    override fun setCurrentProgress(value: Int, readSoFar:Long, totalLength:Long) {
+        CoroutineScope(Main).launch {
+            if(value >= 0)
+                progressBar.progress = value
+            else
+                progressBar.progress = 0
+            if(totalLength <= 0)
+                progressOfFile.text = "$readSoFar bytes / total is unknown from server"
+            else
+                progressOfFile.text = "$readSoFar / $totalLength bytes"
+        }
+    }
+
+    override fun setItemChanged(position: Int) = adapter.notifyItemChanged(position)
 
 }

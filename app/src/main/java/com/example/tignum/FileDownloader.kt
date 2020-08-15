@@ -22,15 +22,19 @@ object FileDownloader {
     }
     private lateinit var sink: BufferedSink
     private lateinit var response: Response<ResponseBody>
+    private var currentPercentage = 1
+    @Volatile
     private var isCancelled = false
-    private var downloadComplete = false
 
     suspend fun downloadOrResume(
         url: String,
         destination: File,
-        onProgress: ((percent: Int, downloaded: Long, total: Long) -> Unit)? = null) {
+        onProgress: ((percent: Int, downloaded: Long, total: Long) -> Unit)? = null,
+        onCancel: ((percent: Int, fileName: String) -> Unit)? = null,
+        onError: ((message: String) -> Unit)? = null,
+        onComplete: ((fileName: String) -> Unit)? = null
+    ) {
         isCancelled = false
-        downloadComplete = false
         var startingFrom = 0L
         val headers: HashMap<String, String> = HashMap()
         if (destination.exists() && destination.length() > 0L) {
@@ -66,64 +70,58 @@ object FileDownloader {
                     println("Getting range from $startingByte to $endingByte of ${totalBytes} bytes")
                 } else {
                     println("- new download")
-                    endingByte = contentLength
-                    totalBytes = contentLength
+                    if (contentLength <= 0) { // server didn't provide content-length
+                        totalBytes = -1
+                        endingByte = -1
+                        onError!!("Failed to obtain content-length from server. however downloading will continue response code is $responseCode")
+                    } else {
+                        endingByte = contentLength
+                        totalBytes = contentLength
+                    }
                     if (destination.exists()) {
                         println("Delete previous download!")
                         destination.delete()
                     }
                 }
 
-                println("Getting range from $startingByte to ${endingByte} of ${totalBytes} bytes")
+                println("Getting range from $startingByte to $endingByte of $totalBytes bytes")
 
                 if (startingByte > 0) {
                     sink = Okio.buffer(Okio.appendingSink(destination))
                 } else {
                     sink = Okio.buffer(Okio.sink(destination))
                 }
-                var lastPercentage = -1
                 var totalRead = startingByte
                 sink.use {
                     it.writeAll(object : ForwardingSource(response.body()!!.source()) {
                         override fun read(sink: Buffer, byteCount: Long): Long {
-                            //println("- Reading... $byteCount")
                             val bytesRead = super.read(sink, byteCount)
                             totalRead += bytesRead
-                            val currentPercentage = (totalRead * 100 / totalBytes).toInt()
-                            //println("Progress: $currentPercentage - $totalRead")
 
-                            if (currentPercentage > lastPercentage) {
-                                lastPercentage = currentPercentage
-                                if (onProgress != null) {
-                                    onProgress(currentPercentage, totalRead, totalBytes)
-                                }
-                            }
+                            currentPercentage = (totalRead * 100 / totalBytes).toInt()
+                            onProgress!!(currentPercentage, totalRead, totalBytes)
+
                             if (isCancelled) {
+                                onCancel!!(currentPercentage, destination.name)
                                 return -1
                             }
-                            if(currentPercentage == 100)
-                                downloadComplete = true
-
                             return bytesRead
                         }
                     })
                 }
                 sink.close()
                 response.body()!!.source().close()
-                if (downloadComplete) {
+                if (!isCancelled) {
                     println("--- Download complete!")
-                    val newDestination =
-                        File(destination.parent, destination.name.replace("InDownloading", ""))
-                    destination.copyTo(newDestination)
-                    println(destination.length())
-                    print(newDestination.length())
-                    destination.delete()
-                    println("${destination.exists()}, ${newDestination.exists()}")
+                    println("destination exists: ${destination.exists()} , path: ${destination.name}")
+                    if (onComplete != null)
+                        onComplete(destination.name)
                 }
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
             println(ex.message)
+            onCancel!!(currentPercentage,destination.name)
         }
     }
 
