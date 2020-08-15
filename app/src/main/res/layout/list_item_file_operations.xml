@@ -7,18 +7,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:padding="4dp"
         android:weightSum="3">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="File Name: "
+            android:text="@string/file_name"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/nameOfFile"
@@ -26,26 +29,28 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="Name"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:padding="4dp"
         android:weightSum="3">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="File Status: "
+            android:text="@string/file_status"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/statusOfFile"
@@ -53,18 +58,36 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="center"
-            android:text="Status "
+            android:text="@string/status"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:max="100"
+        android:padding="8dp"
+        android:progress="0"
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="8dp"
+
         android:weightSum="4">
 
         <Button
@@ -72,10 +95,14 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
             android:text="@string/start_button_text"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 
         <Button
@@ -83,10 +110,14 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
             android:text="@string/pause_button_text"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 
         <Button
@@ -94,10 +125,14 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
             android:text="@string/play_button_text"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 
         <Button
@@ -105,9 +140,13 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/colorPrimaryDark"
             android:text="@string/delete_button_text"
+            android:textAllCaps="false"
             android:textColor="#FFFFFF" />
     </LinearLayout>
 

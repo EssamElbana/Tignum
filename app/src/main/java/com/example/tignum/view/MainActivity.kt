@@ -1,19 +1,16 @@
-package com.example.tignum
+package com.example.tignum.view
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tignum.view.FileItem
-import com.example.tignum.view.FilesRecyclerViewAdapter
+import com.example.tignum.R
+import com.example.tignum.Repository
+import com.example.tignum.model.FileItem
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
 
 
 class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
@@ -30,7 +27,9 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
 
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = linearLayoutManager
-        presenter = FileDownloaderPresenter(this, this)
+        presenter = FileDownloaderPresenter( this,Repository(this))
+
+        adapter.listOfFiles = ArrayList()
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
 
@@ -44,15 +43,25 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
     override fun showErrorMessage(status: String) {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(status)
-        builder.setNeutralButton(android.R.string.yes) { dialog, which -> }
+        builder.setNeutralButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
         builder.show()
     }
 
-    override fun playMediaFile(fileUri: Uri) {
-//        val mediaController = MediaController(this);
-//        videoView.setVideoURI(fileUri)
-//        videoView.setMediaController(mediaController)
-//        videoView.start()
+    override fun confirmUserDeletion(position: Int, fileName: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Are you sure you want to delete $fileName? all file progress will be lose.")
+        builder.setPositiveButton(android.R.string.yes) { dialog, _ ->
+            presenter.onDeletionConfirmed(position, fileName)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(android.R.string.no) { dialog, _ -> dialog.dismiss() }
+        builder.show()
+    }
+
+    override fun playMediaFile(filePath: String) {
+        intent = Intent(this, PlayVideoActivity::class.java)
+        intent.putExtra("FILE_PATH", filePath)
+        startActivity(intent)
     }
 
 
@@ -90,7 +99,6 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if (requestCode == permissionRequestCode) {
             if ((grantResults.isNotEmpty() &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -98,32 +106,24 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
                 presenter.onPermissionsReady()
 
             } else {
-                showErrorMessage("Application won't be able to download files!")
+                showErrorMessage("Application won't be able to download files until permissions is granted!")
             }
         }
     }
 
-    override fun deleteBtnClicked(position: Int) = presenter.delete(position)
+    override fun deleteBtnClicked(position: Int) = presenter.deleteBtnClicked(position)
 
-    override fun startBtnClicked(position: Int) = presenter.start(position)
+    override fun startBtnClicked(position: Int) = presenter.startBtnClicked(position)
 
-    override fun pauseBtnClicked(position: Int) = presenter.pause(position)
+    override fun pauseBtnClicked(position: Int) = presenter.pauseBtnClicked(position)
 
-    override fun playBtnClicked(position: Int) = presenter.play(position)
+    override fun playBtnClicked(position: Int) = presenter.playBtnClicked(position)
 
-    override fun setCurrentProgress(value: Int, readSoFar:Long, totalLength:Long) {
-        CoroutineScope(Main).launch {
-            if(value >= 0)
-                progressBar.progress = value
-            else
-                progressBar.progress = 0
-            if(totalLength <= 0)
-                progressOfFile.text = "$readSoFar bytes / total is unknown from server"
-            else
-                progressOfFile.text = "$readSoFar / $totalLength bytes"
-        }
+    override fun setItemChanged(position: Int, payload: Int?) =
+        adapter.notifyItemChanged(position, payload)
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onViewDestroyed()
     }
-
-    override fun setItemChanged(position: Int) = adapter.notifyItemChanged(position)
-
 }

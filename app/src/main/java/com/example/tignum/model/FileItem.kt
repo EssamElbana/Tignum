@@ -1,4 +1,4 @@
-package com.example.tignum.view
+package com.example.tignum.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -8,4 +8,9 @@
     <string name="type_url_hint">Type URL</string>
     <string name="enqueue_button_text">Enqueue</string>
     <string name="file_progress_text_view">File Progress:</string>
+    <string name="current_progress_bytes">{value} bytes</string>
+    <string name="file_status">File Status:</string>
+    <string name="status">Status</string>
+    <string name="file_name">File Name:</string>
+    <string name="file_progress">File Progress:</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.example.tignum.caching
 
 import androidx.room.*
-import com.example.tignum.view.FileItem
+import com.example.tignum.model.FileItem
 
 @Dao
 interface FileDao {
@@ -15,11 +15,11 @@ interface FileDao {
     fun findByURL(url: String): FileItem
 
     @Insert
-    fun insertAll(vararg fileItem: FileItem)
+    fun insertAll(vararg fileItem: FileItem) :List<Long>
 
     @Delete
-    fun delete(fileItem: FileItem)
+    fun delete(fileItem: FileItem) :Int
 
     @Update
-    fun update(vararg fileItem: FileItem)
+    fun update(vararg fileItem: FileItem) :Int
 }

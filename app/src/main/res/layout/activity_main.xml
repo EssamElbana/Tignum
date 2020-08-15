@@ -5,12 +5,16 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:id="@+id/linear_layout_main"
+    tools:context=".view.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:padding="8dp"
         android:text="@string/title_main_screen"
         android:textColor="#000000"
@@ -39,6 +43,7 @@
         android:background="@color/colorPrimaryDark"
         android:padding="8dp"
         android:text="@string/enqueue_button_text"
+        android:textAllCaps="false"
         android:textColor="#FFFFFF" />
 
     <LinearLayout
@@ -46,43 +51,32 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:weightSum="3">
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="12dp"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            android:padding="8dp"-->
+        <!--            android:weightSum="3">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/file_progress_text_view"
-                android:textColor="#000000"
-                android:textSize="20sp" />
+        <!--            <TextView-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:text="@string/file_progress_text_view"-->
+        <!--                android:textColor="#000000"-->
+        <!--                android:textSize="20sp" />-->
 
-            <TextView
-                android:id="@+id/progressOfFile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:text="bytes"
-                android:textColor="#000000"
-                android:textSize="20sp" />
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:max="100"
-            android:padding="4dp"
-            android:progress="0"
-            android:visibility="visible" />
+        <!--            <TextView-->
+        <!--                android:id="@+id/progressOfFile"-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="2"-->
+        <!--                android:gravity="center"-->
+        <!--                android:text="bytes"-->
+        <!--                android:textColor="#000000"-->
+        <!--                android:textSize="20sp" />-->
+        <!--        </LinearLayout>-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
