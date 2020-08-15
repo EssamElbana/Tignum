@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_layout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:id="@+id/linear_layout_main"
     tools:context=".view.MainActivity">
 
     <TextView
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/style_button"
         android:padding="8dp"
         android:text="@string/enqueue_button_text"
         android:textAllCaps="false"
@@ -51,45 +51,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--        <LinearLayout-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_margin="12dp"-->
-        <!--            android:orientation="horizontal"-->
-        <!--            android:padding="8dp"-->
-        <!--            android:weightSum="3">-->
-
-        <!--            <TextView-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_weight="1"-->
-        <!--                android:text="@string/file_progress_text_view"-->
-        <!--                android:textColor="#000000"-->
-        <!--                android:textSize="20sp" />-->
-
-        <!--            <TextView-->
-        <!--                android:id="@+id/progressOfFile"-->
-        <!--                android:layout_width="wrap_content"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:layout_weight="2"-->
-        <!--                android:gravity="center"-->
-        <!--                android:text="bytes"-->
-        <!--                android:textColor="#000000"-->
-        <!--                android:textSize="20sp" />-->
-        <!--        </LinearLayout>-->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp" />
 
-
-        <!--        <VideoView-->
-        <!--            android:id="@+id/videoView"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_margin="8dp"-->
-        <!--            android:padding="8dp" />-->
     </LinearLayout>
 </LinearLayout>
