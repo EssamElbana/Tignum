@@ -1,4 +1,4 @@
-package com.example.tignum
+package com.example.tignum.repo
 
 import android.content.Context
 import com.example.tignum.caching.FileRoomDatabase
@@ -6,9 +6,11 @@ import com.example.tignum.model.FileItem
 import com.example.tignum.model.FileStatus
 import com.example.tignum.network_client.FileDownloaderAPI
 import com.example.tignum.network_client.RetrofitClient
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.BufferedSink
@@ -16,12 +18,10 @@ import okio.ForwardingSource
 import okio.Okio
 import retrofit2.awaitResponse
 import java.io.File
-import java.lang.IllegalStateException
 import java.util.regex.Pattern
-import kotlin.math.sin
 import kotlin.random.Random
 
-class Repository (context: Context) : RepoInterface{
+class Repository(context: Context) : RepoInterface {
 
     private val fileItemsDao by lazy { FileRoomDatabase.getDatabase(context).fileDao() }
     private val downloadsDirectory: File by lazy { File(context.filesDir, "Tignum-Downloads") }
@@ -30,7 +30,7 @@ class Repository (context: Context) : RepoInterface{
             FileDownloaderAPI::class.java
         )
     }
-    private val requestsMap = HashMap<String,ResponseBody?>()
+    private val requestsMap = HashMap<String, ResponseBody?>()
 
     init {
         downloadsDirectory.mkdir()
@@ -74,8 +74,18 @@ class Repository (context: Context) : RepoInterface{
     }
 
     override suspend fun getAllFileItems(): List<FileItem> = withContext(IO) {
+        val fileItems = fileItemsDao.getAll()
+        val filesInDirectory = downloadsDirectory.list()
+        if (downloadsDirectory.list() == null || downloadsDirectory.list()!!.isEmpty())
+            fileItems.forEach { deleteFile(it) }
+        else if (fileItems.size != filesInDirectory!!.size)
+            fileItems.forEach {
+                if (!filesInDirectory.contains(it.fileName))
+                    deleteFile(it)
+            }
         return@withContext fileItemsDao.getAll()
     }
+
 
     override suspend fun download(
         fileItem: FileItem,
@@ -99,7 +109,7 @@ class Repository (context: Context) : RepoInterface{
             var endingByte = 0L
             var totalBytes = 0L
             if (!response.isSuccessful || response.body() == null)
-                return@withContext "Error + ${response.message()}"
+                return@withContext "code ${response.code()} from server"
             else {
                 val contentLength = response.body()!!.contentLength()
                 val responseCode = response.code()
@@ -136,15 +146,17 @@ class Repository (context: Context) : RepoInterface{
                 } else {
                     sink = Okio.buffer(Okio.sink(file))
                 }
-                if(requestsMap.containsKey(file.name))
+                if (requestsMap.containsKey(file.name))
                     requestsMap.remove(file.name)
                 requestsMap[file.name] = response.body()
-                saveFile(startingByte, file.name, totalBytes, sink, response.body(),
-                    onProgress)
+                saveFile(
+                    startingByte, file.name, totalBytes, sink, response.body(),
+                    onProgress
+                )
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
-            return@withContext ex.message
+            return@withContext ex.message.toString()
         }
     }
 
@@ -157,7 +169,7 @@ class Repository (context: Context) : RepoInterface{
         onProgress: (suspend (name: String, percent: Int, downloaded: Long, total: Long) -> Unit)? = null
     ): String = withContext(IO) {
         var totalRead = _totalRead
-        var lastPercentage=-1
+        var lastPercentage = -1
         try {
             sink.use {
                 it.writeAll(object : ForwardingSource(response!!.source()) {
@@ -180,7 +192,7 @@ class Repository (context: Context) : RepoInterface{
             return@withContext "completed"
         } catch (ex: Exception) {
             ex.printStackTrace()
-            return@withContext "Exception ${ex.message}"
+            return@withContext ex.message.toString()
         }
 
     }

@@ -1,7 +1,7 @@
 package com.example.tignum.view
 
 import android.util.Patterns
-import com.example.tignum.RepoInterface
+import com.example.tignum.repo.RepoInterface
 import com.example.tignum.model.FileItem
 import com.example.tignum.model.FileStatus
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +18,6 @@ class FileDownloaderPresenter(
 
     private var isPermissionsGranted = false
     private val fileItemList: ArrayList<FileItem> = ArrayList()
-
     override fun enqueueBtnClicked() {
         val url = view!!.getInputUrl()
         if (url.isEmpty())
@@ -74,14 +73,13 @@ class FileDownloaderPresenter(
     private fun startDownloadingFile(position: Int) {
         CoroutineScope(Main).launch {
             val fileItem = fileItemList[position]
-            val position = position
             val result = repository.download(fileItem, onProgress =
             { name, progress, downloadedSoFar, totalFileLength ->
                 println("file: $name, progress: $progress, bytes:$downloadedSoFar, total:$totalFileLength ")
                 fileItemList[position].progress = progress
                 fileItem.progress = progress
-                if(view != null)
-                    view!!.setItemChanged(position, PAYLOAD_TAG_PROGRESS)
+                repository.updateFileItem(fileItem)
+                view!!.setItemChanged(position, PAYLOAD_TAG_PROGRESS)
             })
             when (result) {
                 "completed" -> {
@@ -94,9 +92,8 @@ class FileDownloaderPresenter(
                     val item = fileItemList[position]
                     item.status = FileStatus.PAUSED.name
                     repository.updateFileItem(item)
-                    if(view !=null)
-                        view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
-                    if(!result!!.contains("closed"))
+                    view!!.setItemChanged(position, PAYLOAD_TAG_STATUS)
+                    if (!result!!.contains("closed"))
                         view!!.showErrorMessage("Failed reason: $result file name: ${item.fileName}")
                 }
             }
@@ -116,10 +113,6 @@ class FileDownloaderPresenter(
             fileItemList.removeAt(position)
             view!!.showFileList(fileItemList)
         }
-    }
-
-    override fun onViewDestroyed() {
-        view = null
     }
 
     override fun pauseBtnClicked(position: Int) {
@@ -150,9 +143,27 @@ class FileDownloaderPresenter(
     override fun onViewCreated() {
         CoroutineScope(Main).launch {
             val fileItems = repository.getAllFileItems()
+            fileItems.forEach {
+                if (it.status == FileStatus.IN_DOWNLOAD.name) {
+                    it.status = FileStatus.PAUSED.name
+                    repository.updateFileItem(it)
+                }
+            }
             fileItemList.addAll(fileItems)
             view!!.showFileList(fileItemList)
             view!!.requestUserPermission()
+        }
+    }
+
+    override fun onDestroy() {
+        fileItemList.forEach {
+            if(it.status == FileStatus.IN_DOWNLOAD.name) {
+                CoroutineScope(Main).launch {
+                    it.status = FileStatus.PAUSED.name
+                    repository.updateFileItem(it)
+                    repository.stopDownload(it)
+                }
+            }
         }
     }
 }

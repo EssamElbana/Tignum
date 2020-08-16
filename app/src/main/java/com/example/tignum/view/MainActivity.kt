@@ -8,7 +8,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tignum.R
-import com.example.tignum.Repository
+import com.example.tignum.repo.Repository
 import com.example.tignum.model.FileItem
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -27,7 +27,9 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
 
         linearLayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = linearLayoutManager
-        presenter = FileDownloaderPresenter( this,Repository(this))
+        presenter = FileDownloaderPresenter(this,
+            Repository(this)
+        )
 
         adapter.listOfFiles = ArrayList()
         recyclerView.adapter = adapter
@@ -124,6 +126,6 @@ class MainActivity : FileDownloaderContract.View, AppCompatActivity(),
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.onViewDestroyed()
+        presenter.onDestroy()
     }
 }
